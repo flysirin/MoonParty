@@ -1,2 +1,4 @@
 environs==9.5.0
 aiogram==3.0.0b6
+redis==4.5.1
+aioredis==2.0.1
