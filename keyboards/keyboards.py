@@ -1,25 +1,29 @@
 from aiogram.types import (InlineKeyboardMarkup, InlineKeyboardButton,
                            CallbackQuery, KeyboardButton, ReplyKeyboardMarkup, )
 
+
 # from lexicon.lexicon import LEXICON
 
+def admin_kb() -> ReplyKeyboardMarkup:
+    ad_admin_room_button = KeyboardButton(text="Add room admin")
+    delete_admin_room_button = KeyboardButton(text="Delete room admin")
+    show_admin_rooms = KeyboardButton(text="Show room admins")
+    # cancel_state = KeyboardButton(text="Cancel state")
+    cancel_all_data = KeyboardButton(text="Cancel all data!")
 
-def create_inline_kb(*args, **kwargs) -> InlineKeyboardMarkup:
-    read_text_button: InlineKeyboardButton = InlineKeyboardButton(
-        text="Press for read text",
-        callback_data="read_text_button_pressed")
-    send_text_open_ai_button: InlineKeyboardButton = InlineKeyboardButton(
-        text="Send text to AI GPT 3.5",
-        callback_data="send_text_open_ai"
-    )
-    keyboard: InlineKeyboardMarkup = InlineKeyboardMarkup(
-        inline_keyboard=[[read_text_button],
-                         [send_text_open_ai_button]])
+    keyboard = ReplyKeyboardMarkup(keyboard=[[ad_admin_room_button],
+                                             [delete_admin_room_button],
+                                             [show_admin_rooms],
+                                             # [cancel_state],
+                                             [cancel_all_data],
+                                             ],
+                                   resize_keyboard=True,
+                                   on_time_keyboard=True)
     return keyboard
 
 
 def create_admin_room_kb() -> ReplyKeyboardMarkup:
-    start_game_button = KeyboardButton(text="Start game")
+    start_game_button = KeyboardButton(text="Start")
     finish_game_button = KeyboardButton(text="Finish game")
     set_storage_data = KeyboardButton(text="Set data storage")
     get_storage_data = KeyboardButton(text="Get data storage")
@@ -36,12 +40,45 @@ def create_admin_room_kb() -> ReplyKeyboardMarkup:
     return keyboard
 
 
-def create_main_admin_kb() -> InlineKeyboardMarkup:
-    ad_admin_room_button = InlineKeyboardButton(text="Add admin room",
-                                                callback_data="add_admin_room_pressed")
-    delete_admin_room_button = InlineKeyboardButton(text="Delete admin room",
-                                                    callback_data="delete_admin_room_pressed")
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[[ad_admin_room_button],
-                                              [delete_admin_room_button], ])
+def admin_room_inline_kb() -> InlineKeyboardMarkup:
+    game_process = InlineKeyboardButton(text="Start Game", callback_data="start_game_pressed")
+    room_name = InlineKeyboardButton(text="Change room name", callback_data="change_room_name_pressed")
+    change_pass = InlineKeyboardButton(text="Change password", callback_data="change_pass_pressed")
+    game_setting = InlineKeyboardButton(text="Game setting", callback_data="setting_game_pressed")
+    cancel_state = InlineKeyboardButton(text="Cancel state", callback_data="cancel_state")
+    cancel_data = InlineKeyboardButton(text="Cancel data", callback_data="cancel_data")
+
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[game_process],
+                                                     [room_name],
+                                                     [change_pass],
+                                                     [game_setting],
+                                                     [cancel_state],
+                                                     [cancel_data]], )
     return keyboard
 
+
+def confirm_add_to_admins() -> InlineKeyboardMarkup:
+    confirm_user = InlineKeyboardButton(text="Confirm to add admin room",
+                                        callback_data="confirm_add_admin_room")
+    cancel = InlineKeyboardButton(text="Cancel",
+                                  callback_data="cancel_confirm_add_admin")
+
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[confirm_user],
+                                                     [cancel], ])
+    return keyboard
+
+
+def cancel_state_admin() -> InlineKeyboardMarkup:
+    cancel = InlineKeyboardButton(text="Cancel", callback_data="cancel_state_admin")
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[cancel]])
+    return keyboard
+
+
+def cancel_all_data() -> InlineKeyboardMarkup:
+    confirm_delete_all_data = InlineKeyboardButton(text="Attention! Cancel ALL data!!!",
+                                                   callback_data="confirm_cancel_all_data(!)")
+    cancel = InlineKeyboardButton(text="Cancel operation",
+                                  callback_data="cancel_delete_all_data")
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[confirm_delete_all_data],
+                                                     [cancel], ])
+    return keyboard
