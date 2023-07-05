@@ -43,6 +43,7 @@ async def add_admin_room(message: Message, state: FSMContext, bot: Bot):
     await state.set_state(FSMAdmin.add_admin_room)
     await message.answer(text="Input user's link or nickname like a @nickname with '@'",
                          reply_markup=keyboards.cancel_state_admin())
+    await message.delete()
 
 
 @router_admin.message(or_f(Text(contains='/'), Text(startswith='@')), StateFilter(
