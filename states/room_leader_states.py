@@ -12,4 +12,3 @@ class FSMAdminRoom(StatesGroup):
     game_setting_process = State()
 
     game_process = State()
-    # finish_game = State()
