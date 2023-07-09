@@ -5,7 +5,7 @@ from aiogram.fsm.state import default_state
 from states.admin_states import FSMAdmin
 
 from aiogram.filters import Command, CommandStart, StateFilter, Text, ChatMemberUpdatedFilter, or_f
-from filters.member_filters import IsRoomLeader, IsMainAdmins
+from filters.member_filters import IsMainAdmins
 
 from aiogram.types import Message, CallbackQuery
 from keyboards import admin_keyboards
@@ -19,6 +19,7 @@ logger_admin_handler = logging.getLogger(__name__)
 
 router_admin = Router()
 router_admin.message.filter(IsMainAdmins())
+router_admin.callback_query.filter(IsMainAdmins())
 
 
 @router_admin.message(CommandStart())
@@ -141,7 +142,7 @@ async def delete_room_leader(callback: CallbackQuery, state: FSMContext):
 
 
 @router_admin.callback_query(Text("##cancel##operation##"))
-async def cancel_operation_room_leader(callback: CallbackQuery, state: FSMContext):
+async def cancel_operation_room_leader(callback: CallbackQuery, state: FSMContext, bot: Bot):
     await callback.answer(text="Cancel operation")
     await state.set_state(None)
     await callback.message.delete()
@@ -149,7 +150,7 @@ async def cancel_operation_room_leader(callback: CallbackQuery, state: FSMContex
 
 @router_admin.callback_query()  # test exception
 async def get_room_leader2(callback: CallbackQuery, state: FSMContext):
-    await callback.answer(text=f"{callback.data}")
+    await callback.answer(text=f"from router admin another callback data: {callback.data}")
 # <-- End handlers for show room leaders
 
 # -----------
