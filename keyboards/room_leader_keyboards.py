@@ -31,10 +31,10 @@ def registered_players_inline_kb(**kwargs) -> InlineKeyboardMarkup:
         InlineKeyboardButton(text="🎮 Start game ", callback_data=f"_start_game_pressed_")]
 
     if kwargs:
-        for nickname, annotation in kwargs.items():
-            user_id = annotation.get('user_id', 0)
+        for user_id, annotation in kwargs.items():
+            nickname = annotation.get('nickname', 'nickname')
             buttons.append(InlineKeyboardButton(text=f"Player: {nickname}",
-                                                callback_data=f"__{nickname}__player__"))
+                                                callback_data=f"__{user_id}__player__user_id__"))
 
     kb_builder.row(*buttons, width=1)
     return kb_builder.as_markup()  # return object inline kb
@@ -46,10 +46,10 @@ def game_process_menu(**kwargs) -> InlineKeyboardMarkup:
         InlineKeyboardButton(text="❌ 🎮 Finish game ", callback_data=f"_finish_game_pressed_")]
 
     if kwargs:
-        for nickname, annotation in kwargs.items():
-            user_id = annotation.get('user_id', 0)
+        for user_id, annotation in kwargs.items():
+            nickname = annotation.get('nickname', 'nickname')
             buttons.append(InlineKeyboardButton(text=f"Player: {nickname}",
-                                                callback_data=f"__{nickname}__player__"))
+                                                callback_data=f"__{user_id}__player__user_id__"))
 
     kb_builder.row(*buttons, width=1)
     return kb_builder.as_markup()  # return object inline kb
