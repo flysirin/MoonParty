@@ -30,7 +30,11 @@ class IsMainAdmins(BaseFilter):
         return message.from_user.id in _MAIN_ADMINS
 
 
-class IsRegisterUsers(BaseFilter):
+class CheckPassFilter(BaseFilter):
     async def __call__(self, message: Message) -> bool:
-        return False
+        user_data = await get_data_from_user(bot=bot_object, user_id=message.from_user.id)
+        select_leader_id = user_data.get("select_leader_id", 0)
+        leader_data = await get_data_from_user(bot=bot_object, user_id=int(select_leader_id))
+        leader_pass = leader_data.get("password", "")
+        return leader_pass == message.text
 
