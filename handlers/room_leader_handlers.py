@@ -10,7 +10,7 @@ from filters.member_filters import IsRoomLeader
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 from keyboards import room_leader_keyboards
 
-from lexicon.lexicon import LEXICON
+from lexicon.lexicon import LEADER_LEXICON
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -23,12 +23,12 @@ router_room_leader.callback_query.filter(IsRoomLeader())
 
 @router_room_leader.message(F.text or Command("start"), StateFilter(FSMRoomLeader.game_process))
 async def exception_game_process(message: Message, state: FSMContext):
-    await message.answer(text="You are in a state of play. Finish the game to go to the main menu.")
+    await message.answer(text=LEADER_LEXICON['Message state of play'])
 
 
 @router_room_leader.callback_query(~Text(["_start_game_pressed_", "_finish_game_pressed_"]), StateFilter(FSMRoomLeader.game_process))
 async def exception_game_process(callback: CallbackQuery, state: FSMContext):
-    await callback.message.answer(text="You are in a state of play.")
+    await callback.message.answer(text=LEADER_LEXICON['Message state of play'])
 
 
 @router_room_leader.message(CommandStart())
@@ -43,7 +43,7 @@ async def process_start_command(message: Message, state: FSMContext):
 @router_room_leader.callback_query(Text("change_room_name_pressed"))
 async def change_room_name(callback: CallbackQuery, state: FSMContext):
     await state.set_state(FSMRoomLeader.input_room_name)
-    await callback.message.answer(text="Waiting for a room name:")
+    await callback.message.answer(text=LEADER_LEXICON['Waiting for a room name:'])
 
 
 @router_room_leader.message(F.text, StateFilter(FSMRoomLeader.input_room_name))
@@ -76,12 +76,12 @@ async def input_password(message: Message, state: FSMContext):
 async def init_game_process(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     if not (data.get('room_name', '') and data.get('password', '')):
-        return await callback.answer(text="Can't start without Room Name or pass")
+        return await callback.answer(text=LEADER_LEXICON["Can't start without Room Name or pass"])
     players = data.get('players', {})
-    await callback.message.answer(text=f"Registered players:",
+    await callback.message.answer(text=LEADER_LEXICON["Message waiting players"],
                                   reply_markup=room_leader_keyboards.registered_players_inline_kb(**players))
     await state.set_state(FSMRoomLeader.wait_register_players)
-    # await callback.message.answer(text=f"Waiting register players")
+    await state.update_data(active_registration=True)
     await callback.answer()
 
 
@@ -97,18 +97,18 @@ async def update_user_list(callback: CallbackQuery, state: FSMContext):
 @router_room_leader.callback_query(Text("_start_game_pressed_"))
 async def start_game_process(callback: CallbackQuery, state: FSMContext):
     await callback.answer(text=f"Start game pressed")
+    await state.update_data(active_registration=False)
     await state.set_state(FSMRoomLeader.game_process)
     players = (await state.get_data()).get('players', {})
-    await state.update_data(is_active=True)
     await callback.message.answer(text=f"Game menu: ",
                                   reply_markup=room_leader_keyboards.game_process_menu(**players))
 
 
 @router_room_leader.callback_query(Text("_finish_game_pressed_"), StateFilter(FSMRoomLeader.game_process))
 async def start_game_process(callback: CallbackQuery, state: FSMContext):
-    await callback.message.answer(text=f"Game data cleared")
+    await callback.message.answer(text=f"{LEADER_LEXICON['Game data cleared']}")
     await update_user_list(callback, state)
-    await state.update_data(is_active=False)
+    await state.update_data(active_registration=False)
     await state.set_state(FSMRoomLeader.wait_register_players)
     # await callback.message.answer(text=f"")
 # <-- End handlers for game process
@@ -134,7 +134,7 @@ async def command_cancel(message: Message, state: FSMContext, bot: Bot):
 
 @router_room_leader.message(Command(commands=["help"]), StateFilter(default_state))
 async def process_help_command(message: Message, state: FSMContext):
-    await message.answer(text=LEXICON["/help_admin"])
+    await message.answer(text=LEADER_LEXICON["/help"])
 
 
 @router_room_leader.callback_query()
