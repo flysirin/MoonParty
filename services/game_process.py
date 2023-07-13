@@ -14,6 +14,7 @@ player_template: dict = {user_id: {'nickname': username, 'role': None, 'lives': 
 def start_init_players(count: int = 10):
     data.update({'who_did_not_speak_ids': []})  # next speakers
     data.update({'who_checked_this_move_ids': []})
+    data.update({'winners': []})
     players = data.get('players', {})
 
     list_roles = init_roles(count=count)
@@ -44,14 +45,18 @@ def init_roles(count: int):
 
 
 def get_player_who_did_not_speak_id():
-    if not data.get('who_did_not_speak_ids', []):
-        return False
-    return data['who_did_not_speak_ids'].pop()
+    while data.get('who_did_not_speak_ids', []):
+        speaker_id = data['who_did_not_speak_ids'].pop()
+        if (0 < data['players'][speaker_id]['lives'] < 20):
+            return speaker_id
+    return False
 
 
 def connect_two_players(speaker_id: int, who_checked_id: int):
     player_who_checked_role = data['players'][who_checked_id]['role']
-    data['players'][speaker_id]['who_checked_role'].append(player_who_checked_role)  # add role, who checked with speaker
+    data['players'][speaker_id]['who_checked_role'].append(
+        player_who_checked_role)  # add role, who checked with speaker
+
     if data['players'][speaker_id]['role'] == player_who_checked_role:
         data['players'][who_checked_id]['lives'] += 2
     else:
@@ -65,35 +70,82 @@ def make_move_for_players():
         return False
 
     speaker_role = data['players'][speaker_id]['role']
-    for player_id in data['players']:                           # random move with speaker, only for test
-        if player_id != speaker_id:
+    for player_id in data['players']:  # random move with speaker, only for test
+        if player_id != speaker_id and (0 < data['players'][player_id]['lives'] < 20):  # check alive
             if randint(0, 1):
                 connect_two_players(speaker_id, player_id)
 
-    for player_id in data['players']:                           # check players, who did not check with speaker
-        if player_id != speaker_id and (player_id not in data['who_checked_this_move_ids']):
+    for player_id in data['players']:  # check players, who did not connect with speaker
+        if player_id != speaker_id and (player_id not in data['who_checked_this_move_ids']) \
+                and (0 < data['players'][player_id]['lives'] < 20):
             data['players'][player_id]['lives'] -= 1
 
     # --> speaker scoring block
     who_checked_with_speaker_roles: list[str] = data['players'][speaker_id]['who_checked_role']
-    if not who_checked_with_speaker_roles:                        # if did not check with speaker
+    if not who_checked_with_speaker_roles:  # if did not check with speaker
         data['players'][speaker_id]['lives'] -= 5
 
-    elif len(set(who_checked_with_speaker_roles)) == 1:           # if only opposite or same roles
+    elif len(set(who_checked_with_speaker_roles)) == 1:  # if only opposite or same roles
         if speaker_role == who_checked_with_speaker_roles[0]:
             data['players'][speaker_id]['lives'] -= 3
         else:
             data['players'][speaker_id]['lives'] -= 2
 
-    elif len(set(who_checked_with_speaker_roles)) != 1:           # if different roles checked with speaker
+    elif len(set(who_checked_with_speaker_roles)) != 1:  # if different roles checked with speaker
         opposite_role = 'human' if speaker_role == 'wolf' else 'human'
         count_opposite_roles = who_checked_with_speaker_roles.count(opposite_role)
         data['players'][speaker_id]['lives'] += 2 * count_opposite_roles
 
     # end move
-    data['who_checked_this_move_ids'] = []  # clear move data
+    data['who_checked_this_move_ids'] = []                  # clear move data
+    data['players'][speaker_id]['who_checked_role'] = []    # clear speaker data
+    check_append_winners()
 
-    return True
+    return speaker_id
+
+
+def init_next_game_circle():
+    for player_id, player_data in data['players'].items():
+        if 0 < player_data['lives'] < 20:
+            data['who_did_not_speak_ids'].append(player_id)
+
+            if player_data['is_werewolf']:  # swap role for werewolf
+                role = data['players'][player_id]['role']
+                data['players'][player_id]['role'] = 'human' if role == 'wolf' else 'wolf'
+
+    shuffle(data['who_did_not_speak_ids'])
+
+
+def print_game_table_info(speaker_id: int):
+    _data = data['players']
+    print(f"=" * 52)
+    print(f"{'nickname':<5} | {'role':<5} | {'lives':<5} | {'is werewolf':<5} | {'is speaker?':<5}")
+    for player_id in _data:
+        print(f"_" * 52)
+        print(f"{_data[player_id]['nickname']:<5} | {_data[player_id]['role']:<5} |"
+              f" {_data[player_id]['lives']:^5} | {['', 'werewolf'][_data[player_id]['is_werewolf']]:^11}"
+              f" | {['', 'Speaker'][speaker_id == player_id]:^5}")
+    print()
+    print(f" " * 52)
+
+
+def check_append_winners():
+    for player_id, player_data in data['players'].items():
+        if player_data['lives'] >= 20 and player_id not in data['winners']:
+            data['winners'].append(player_id)
+
+
+def _do_game_circles(count_players: int = 5, circles: int = 10):  # test func
+    start_init_players(count_players)
+
+    for i in range(circles):
+        print(f"Game circle: {i + 1}")
+        print(f"+" * 52)
+        while speaker_id := make_move_for_players():
+            print_game_table_info(speaker_id=speaker_id)
+            # sleep(0.1)
+        init_next_game_circle()
+    print(data['winners'])
 
 
 #
@@ -104,18 +156,4 @@ def make_move_for_players():
 #
 #
 # start init players
-start_init_players(5)
-# pprint(data)
-for i in range(10):
-    make_move_for_players()
-pprint(data)
-
-
-
-
-
-
-
-
-
-
+_do_game_circles(count_players=8, circles=10)
