@@ -8,8 +8,10 @@ from lexicon.lexicon import USER_LEXICON
 
 def start_kb() -> ReplyKeyboardMarkup:
     show_active_rooms = KeyboardButton(text=USER_LEXICON["Show active rooms"])
+    set_nickname = KeyboardButton(text=USER_LEXICON["Set nickname"])
     cancel_state = KeyboardButton(text=USER_LEXICON["Click to exit"])
     keyboard = ReplyKeyboardMarkup(keyboard=[[show_active_rooms],
+                                             [set_nickname],
                                              [cancel_state],
                                              ],
                                    resize_keyboard=True,
@@ -30,13 +32,23 @@ def active_rooms_inline_kb(**kwargs) -> InlineKeyboardMarkup:
     return kb_builder.as_markup()  # return object inline kb
 
 
+def user_game_kb() -> InlineKeyboardMarkup:
+    change_role = InlineKeyboardButton(text=USER_LEXICON["Change role"],
+                                       callback_data=f"##change##role##pressed##")
+    show_your_role = InlineKeyboardButton(text=USER_LEXICON["Show your role"],
+                                          callback_data=f"##show##role##pressed##")
+
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[change_role],
+                                                     [show_your_role],
+                                                     ])
+    return keyboard
+
+
 def cancel_operation() -> InlineKeyboardMarkup:
     cancel = InlineKeyboardButton(text=USER_LEXICON["Click to exit"],
                                   callback_data=f"##cancel##operation##")
     keyboard = InlineKeyboardMarkup(inline_keyboard=[[cancel]])
     return keyboard
-
-
 
 # def input_pass_inline_kb(room_name) -> InlineKeyboardMarkup:
 #     input_pass = InlineKeyboardButton(text=f"{USER_LEXICON['Input password: ']}{room_name} ",
