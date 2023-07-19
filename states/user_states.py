@@ -7,9 +7,10 @@ class FSMUser(StatesGroup):
     listing the possible states it will be in
     bot at different moments of interaction with the user"""
 
-    in_game = State()
-    state_2 = State()
-    state_3 = State()
+    input_pass_mode = State()
+    success_game_enter = State()
+    set_nickname = State()
+
 
 
 

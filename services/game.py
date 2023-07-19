@@ -2,12 +2,13 @@ import asyncio
 from aiogram import Bot
 from random import choice, shuffle, randint
 from bot_object import bot_object
-from models.methods import get_data_from_user, update_data_from_user
+from models.methods import get_user_data, update_user_data, set_user_state
 from lexicon.lexicon import USER_LEXICON, USER_TIMER
+from services.user_services import send_info_to_users
 
 
-async def start_init_players(leader_id: int):
-    data = await get_data_from_user(bot_object, leader_id)
+async def start_init_players(host_id: int):
+    data = await get_user_data(bot_object, host_id)
     data.update({'who_did_not_speak_ids': []})  # next speakers
     data.update({'who_clinked_this_move_ids': []})
     data.update({'winners': []})
@@ -29,7 +30,7 @@ async def start_init_players(leader_id: int):
         data['who_did_not_speak_ids'].append(player_id)
         shuffle(data['who_did_not_speak_ids'])
     data["players"] = players
-    await update_data_from_user(bot_object, leader_id, data=data)
+    await update_user_data(bot_object, host_id, data=data)
 
 
 async def _init_roles(count: int):
@@ -44,20 +45,20 @@ async def _init_roles(count: int):
     return list_roles
 
 
-async def _get_player_who_did_not_speak_id(leader_id: int):
-    data = await get_data_from_user(bot_object, leader_id)
+async def _get_player_who_did_not_speak_id(host_id: int):
+    data = await get_user_data(bot_object, host_id)
     while data.get('who_did_not_speak_ids', []):
         speaker_id = data['who_did_not_speak_ids'].pop()
         if 0 < data['players'][speaker_id]['lives'] < 20:
             data['current_speaker'] = speaker_id
             data['players'][speaker_id]['is_speaker'] = True
-            await update_data_from_user(bot_object, leader_id, data=data)
+            await update_user_data(bot_object, host_id, data=data)
             return speaker_id
     return False
 
 
-async def _connect_two_players(leader_id: int, speaker_id: int, who_clinked_id: int):
-    data = await get_data_from_user(bot_object, leader_id)
+async def _connect_two_players(host_id: int, speaker_id: int, who_clinked_id: int):
+    data = await get_user_data(bot_object, host_id)
 
     player_who_clinked_role = data['players'][who_clinked_id]['role']
     data['players'][speaker_id]['who_clinked_role'].append(
@@ -68,11 +69,11 @@ async def _connect_two_players(leader_id: int, speaker_id: int, who_clinked_id: 
     else:
         data['players'][who_clinked_id]['lives'] -= 2
     data['who_clinked_this_move_ids'].append(who_clinked_id)
-    await update_data_from_user(bot_object, leader_id, data=data)
+    await update_user_data(bot_object, host_id, data=data)
 
 
-async def _end_move_scoring_block(leader_id: int, speaker_id: int):
-    data = await get_data_from_user(bot_object, leader_id)
+async def _end_move_scoring_block(host_id: int, speaker_id: int):
+    data = await get_user_data(bot_object, host_id)
 
     speaker_role = data['players'][speaker_id]['role']
     for player_id in data['players']:  # check players, who did not clink with speaker
@@ -104,12 +105,12 @@ async def _end_move_scoring_block(leader_id: int, speaker_id: int):
 
     upd_data = await _check_append_winners(data=data)
 
-    await update_data_from_user(bot_object, leader_id, data=upd_data)
+    await update_user_data(bot_object, host_id, data=upd_data)
     return speaker_id
 
 
-async def _init_next_game_circle(leader_id: int):
-    data = await get_data_from_user(bot_object, leader_id)
+async def _init_next_game_circle(host_id: int):
+    data = await get_user_data(bot_object, host_id)
     for player_id, player_data in data['players'].items():
         if 0 < player_data['lives'] < 20:
             data['who_did_not_speak_ids'].append(player_id)
@@ -119,7 +120,7 @@ async def _init_next_game_circle(leader_id: int):
                 data['players'][player_id]['role'] = 'human' if role == 'wolf' else 'wolf'
 
     shuffle(data['who_did_not_speak_ids'])
-    await update_data_from_user(bot_object, leader_id, data=data)
+    await update_user_data(bot_object, host_id, data=data)
 
 
 async def _check_append_winners(data: dict):
@@ -129,11 +130,11 @@ async def _check_append_winners(data: dict):
     return data
 
 
-async def _check_continue_game(leader_id: int, bot: Bot):
-    data_leader = await get_data_from_user(bot, leader_id)
-    active_game = data_leader.get('active_game', False)
-    more_one_alive = 1 <= sum(map(lambda p: p['lives'] > 0, data_leader['players'].values()))
-    is_three_winners = 3 >= sum(map(lambda p: p['lives'] >= 20, data_leader['players'].values()))
+async def _check_continue_game(host_id: int, bot: Bot):
+    data_host = await get_user_data(bot, host_id)
+    active_game = data_host.get('active_game', False)
+    more_one_alive = 1 <= sum(map(lambda p: p['lives'] > 0, data_host['players'].values()))
+    is_three_winners = 3 >= sum(map(lambda p: p['lives'] >= 20, data_host['players'].values()))
 
     return active_game and more_one_alive and is_three_winners
 
@@ -155,10 +156,10 @@ async def _speaker_timer(speaker_id: int, time: int, bot: Bot):
 
 
 async def clink_two_players(speaker_serial_number: int, who_clinked_id: int):
-    leader_id = (await get_data_from_user(bot_object, who_clinked_id)).get('select_leader_id', 0)
-    if not leader_id:
+    host_id = (await get_user_data(bot_object, who_clinked_id)).get('select_host_id', 0)
+    if not host_id:
         return False
-    data = await get_data_from_user(bot_object, leader_id)
+    data = await get_user_data(bot_object, host_id)
     speaker_set = {value.get('user_number', 0) for value in data['players'].values()
                    if value.get('user_number', 0) == speaker_serial_number}
     if not speaker_set:
@@ -176,27 +177,27 @@ async def clink_two_players(speaker_serial_number: int, who_clinked_id: int):
     else:
         data['players'][who_clinked_id]['lives'] -= 2
     data['who_clinked_this_move_ids'].append(who_clinked_id)
-    await update_data_from_user(bot_object, leader_id, data=data)
+    await update_user_data(bot_object, host_id, data=data)
 
 
-async def game_process(leader_id: int, bot: Bot, speak_time: int = 60):
-    if not await _check_continue_game(leader_id, bot):
+async def game_process(host_id: int, bot: Bot, speak_time: int = 60):
+    if not await _check_continue_game(host_id, bot):
         return False
 
-    speaker_id = await _get_player_who_did_not_speak_id(leader_id)
+    speaker_id = await _get_player_who_did_not_speak_id(host_id)
     if not speaker_id:
-        await _init_next_game_circle(leader_id)
-        speaker_id = await _get_player_who_did_not_speak_id(leader_id)
+        await _init_next_game_circle(host_id)
+        speaker_id = await _get_player_who_did_not_speak_id(host_id)
         if not speaker_id:
             return False
 
     await _speaker_timer(speaker_id=speaker_id, time=speak_time, bot=bot)
-    await _end_move_scoring_block(leader_id=leader_id, speaker_id=speaker_id)
-
-    if not await _check_continue_game(leader_id, bot):
+    await _end_move_scoring_block(host_id=host_id, speaker_id=speaker_id)
+    await send_info_to_users(host_id=host_id, bot=bot)
+    if not await _check_continue_game(host_id, bot):
         return False
 
-    return await game_process(leader_id=leader_id, bot=bot)
+    return await game_process(host_id=host_id, bot=bot)
 
 
 #
@@ -205,24 +206,28 @@ async def game_process(leader_id: int, bot: Bot, speak_time: int = 60):
 #
 #
 
-async def clear_data_game(leader_id, bot: Bot):
-    leader_data = await get_data_from_user(bot, leader_id)
-    leader_data.update({'who_did_not_speak_ids': []})  # next speakers
-    leader_data.update({'who_clinked_this_move_ids': []})
-    leader_data.update({'current_speaker': 0})
-    leader_data.update({'active_game': False})
-    await update_data_from_user(bot=bot, user_id=leader_id, data=leader_data)
+async def clear_data_game(host_id, bot: Bot):
+    host_data = await get_user_data(bot, host_id)
+    host_data.update({'who_did_not_speak_ids': []})  # next speakers
+    host_data.update({'who_clinked_this_move_ids': []})
+    host_data.update({'current_speaker': 0})
+    host_data.update({'active_game': False})
+    players_ids = set(host_data.get('players', {}))
+    for player_id in players_ids:
+        await set_user_state(bot=bot, user_id=player_id, state=None)
 
-# async def _make_move_for_players_test(leader_id: int):
-#     speaker_id = await _get_player_who_did_not_speak_id(leader_id)
+    await update_user_data(bot=bot, user_id=host_id, data=host_data)
+
+# async def _make_move_for_players_test(host_id: int):
+#     speaker_id = await _get_player_who_did_not_speak_id(host_id)
 #     if not speaker_id:
 #         return False
 #
-#     data = await get_data_from_user(bot_object, leader_id)
+#     data = await get_data_from_user(bot_object, host_id)
 #     for player_id in data['players']:  # random move with speaker, only for test
 #         if player_id != speaker_id and (0 < data['players'][player_id]['lives'] < 20):  # check alive
 #             if randint(0, 1):
-#                 await connect_two_players(leader_id, speaker_id, player_id)
-#     await update_data_from_user(bot_object, leader_id, data=data)
+#                 await connect_two_players(host_id, speaker_id, player_id)
+#     await update_data_from_user(bot_object, host_id, data=data)
 #
 #     return speaker_id

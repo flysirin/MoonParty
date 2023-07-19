@@ -154,5 +154,15 @@ def _do_game_circles(count_players: int = 5, circles: int = 10):  # test func
 #
 #
 #
-# start init players
-_do_game_circles(count_players=8, circles=10)
+# _do_game_circles(count_players=8, circles=10)
+
+__data: dict = {'players': {1: {'nickname': f"Player_{1}", 'role': 'role', 'lives': 10,
+                                'is_werewolf': True, 'is_change_role': False,
+                                'who_clinked_role': []},
+                            2: {'nickname': f"Player_{2}", 'role': 'role', 'lives': 0,
+                                'is_werewolf': True, 'is_change_role': False,
+                                'who_clinked_role': []},
+                            }
+                }
+
+

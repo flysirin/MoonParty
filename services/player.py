@@ -7,10 +7,16 @@ class Player:
         self.role = role
 
 
-    def
+########################################################################################################################
 
-    def __setitem__(self, key, value):
-        pass
 
-    def __getitem__(self, item):
-        pass
+
+
+
+
+
+
+
+
+
+

@@ -3,16 +3,16 @@ from aiogram.types import (InlineKeyboardMarkup, InlineKeyboardButton,
 
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from lexicon.lexicon import USER_LEXICON
+from lexicon.lexicon import USER_BOTTOMS
 
 
 def start_kb() -> ReplyKeyboardMarkup:
-    show_active_rooms = KeyboardButton(text=USER_LEXICON["Show active rooms"])
-    set_nickname = KeyboardButton(text=USER_LEXICON["Set nickname"])
-    cancel_state = KeyboardButton(text=USER_LEXICON["Click to exit"])
+    show_active_rooms = KeyboardButton(text=USER_BOTTOMS["Show active rooms"])
+    set_nickname = KeyboardButton(text=USER_BOTTOMS["Set nickname"])
+    # cancel_state = KeyboardButton(text=USER_LEXICON["Click to exit"])
     keyboard = ReplyKeyboardMarkup(keyboard=[[show_active_rooms],
                                              [set_nickname],
-                                             [cancel_state],
+                                             # [cancel_state],
                                              ],
                                    resize_keyboard=True,
                                    on_time_keyboard=True)
@@ -24,18 +24,18 @@ def active_rooms_inline_kb(**kwargs) -> InlineKeyboardMarkup:
     buttons: list[InlineKeyboardButton] = []
 
     if kwargs:
-        for room_name, leader_id in kwargs.items():
+        for room_name, host_id in kwargs.items():
             buttons.append(InlineKeyboardButton(text=f"{room_name}",
-                                                callback_data=f"__{room_name}__name__{leader_id}__id__"))
+                                                callback_data=f"__{room_name}__name__{host_id}__id__"))
 
     kb_builder.row(*buttons, width=1)
     return kb_builder.as_markup()  # return object inline kb
 
 
 def user_game_kb() -> InlineKeyboardMarkup:
-    change_role = InlineKeyboardButton(text=USER_LEXICON["Change role"],
+    change_role = InlineKeyboardButton(text=USER_BOTTOMS["Change role"],
                                        callback_data=f"##change##role##pressed##")
-    show_your_role = InlineKeyboardButton(text=USER_LEXICON["Show your role"],
+    show_your_role = InlineKeyboardButton(text=USER_BOTTOMS["Show your role"],
                                           callback_data=f"##show##role##pressed##")
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=[[change_role],
@@ -45,7 +45,7 @@ def user_game_kb() -> InlineKeyboardMarkup:
 
 
 def cancel_operation() -> InlineKeyboardMarkup:
-    cancel = InlineKeyboardButton(text=USER_LEXICON["Click to exit"],
+    cancel = InlineKeyboardButton(text=USER_BOTTOMS["Click to exit"],
                                   callback_data=f"##cancel##operation##")
     keyboard = InlineKeyboardMarkup(inline_keyboard=[[cancel]])
     return keyboard

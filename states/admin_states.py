@@ -7,8 +7,8 @@ class FSMAdmin(StatesGroup):
     listing the possible states it will be in
     bot at different moments of interaction with the admin"""
 
-    add_room_leader = State()
-    delete_room_leader = State()
+    add_host = State()
+    delete_host = State()
 
 
 

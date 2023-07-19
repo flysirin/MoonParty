@@ -168,3 +168,4 @@ test_fsm_db_redis.py
 venv_linux
 
 my_diary_for_MoonParty
+services\tests
