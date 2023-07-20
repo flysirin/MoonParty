@@ -9,6 +9,6 @@ class FSMAdmin(StatesGroup):
 
     add_host = State()
     delete_host = State()
-
+    delete_all_data = State()
 
 
