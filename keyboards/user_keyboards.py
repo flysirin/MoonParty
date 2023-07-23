@@ -3,12 +3,12 @@ from aiogram.types import (InlineKeyboardMarkup, InlineKeyboardButton,
 
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from lexicon.lexicon import USER_BOTTOMS
+from lexicon.lexicon import USER_BUTTONS
 
 
 def start_kb() -> ReplyKeyboardMarkup:
-    show_active_rooms = KeyboardButton(text=USER_BOTTOMS["Show active rooms"])
-    set_nickname = KeyboardButton(text=USER_BOTTOMS["Set nickname"])
+    show_active_rooms = KeyboardButton(text=USER_BUTTONS["Show active rooms"])
+    set_nickname = KeyboardButton(text=USER_BUTTONS["Set nickname"])
     # cancel_state = KeyboardButton(text=USER_LEXICON["Click to exit"])
     keyboard = ReplyKeyboardMarkup(keyboard=[[show_active_rooms],
                                              [set_nickname],
@@ -33,9 +33,9 @@ def active_rooms_inline_kb(**kwargs) -> InlineKeyboardMarkup:
 
 
 def user_game_kb() -> InlineKeyboardMarkup:
-    change_role = InlineKeyboardButton(text=USER_BOTTOMS["Change role"],
+    change_role = InlineKeyboardButton(text=USER_BUTTONS["Change role"],
                                        callback_data=f"##change##role##pressed##")
-    show_your_role = InlineKeyboardButton(text=USER_BOTTOMS["Show your role"],
+    show_your_role = InlineKeyboardButton(text=USER_BUTTONS["Show your role"],
                                           callback_data=f"##show##role##pressed##")
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=[[change_role],
@@ -45,7 +45,7 @@ def user_game_kb() -> InlineKeyboardMarkup:
 
 
 def cancel_operation() -> InlineKeyboardMarkup:
-    cancel = InlineKeyboardButton(text=USER_BOTTOMS["Click to exit"],
+    cancel = InlineKeyboardButton(text=USER_BUTTONS["Click to exit"],
                                   callback_data=f"##cancel##operation##")
     keyboard = InlineKeyboardMarkup(inline_keyboard=[[cancel]])
     return keyboard

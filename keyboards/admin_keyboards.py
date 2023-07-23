@@ -2,14 +2,14 @@ from aiogram.types import (InlineKeyboardMarkup, InlineKeyboardButton,
                            KeyboardButton, ReplyKeyboardMarkup)
 
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-from lexicon.lexicon import ADMIN_BOTTOMS
+from lexicon.lexicon import ADMIN_BUTTONS
 
 
 def admin_kb() -> ReplyKeyboardMarkup:
-    ad_host_button = KeyboardButton(text=ADMIN_BOTTOMS["Add host"])
-    show_hosts_button = KeyboardButton(text=ADMIN_BOTTOMS["Show hosts"])
+    ad_host_button = KeyboardButton(text=ADMIN_BUTTONS["Add host"])
+    show_hosts_button = KeyboardButton(text=ADMIN_BUTTONS["Show hosts"])
     # create_room_button = KeyboardButton(text=ADMIN_BOTTOMS["Create room for game"])
-    delete_all_data_button = KeyboardButton(text=ADMIN_BOTTOMS["Delete all data!"])
+    delete_all_data_button = KeyboardButton(text=ADMIN_BUTTONS["Delete all data!"])
 
     keyboard = ReplyKeyboardMarkup(keyboard=[[ad_host_button],
                                              [show_hosts_button],
@@ -27,9 +27,9 @@ def show_hosts_inline_kb(width: int = 1, **kwargs: dict) -> InlineKeyboardMarkup
     if kwargs:
         for nickname, annotation in kwargs.items():
             # user_id = annotation.get('user_id', 0)
-            buttons.append(InlineKeyboardButton(text=f"{ADMIN_BOTTOMS['Host:']} {nickname}",
+            buttons.append(InlineKeyboardButton(text=f"{ADMIN_BUTTONS['Host:']} {nickname}",
                                                 callback_data=f"__{nickname}__"))
-        buttons.append(InlineKeyboardButton(text=ADMIN_BOTTOMS["Cancel operation"],
+        buttons.append(InlineKeyboardButton(text=ADMIN_BUTTONS["Cancel operation"],
                                             callback_data=f"##cancel##operation##"))
 
     kb_builder.row(*buttons, width=width)  # unpack button's list to builder by method row with param width
@@ -38,11 +38,11 @@ def show_hosts_inline_kb(width: int = 1, **kwargs: dict) -> InlineKeyboardMarkup
 
 
 def set_options_for_host_kb(nickname: str) -> InlineKeyboardMarkup:
-    show_statistic_button = InlineKeyboardButton(text=ADMIN_BOTTOMS["Show statistic"],
+    show_statistic_button = InlineKeyboardButton(text=ADMIN_BUTTONS["Show statistic"],
                                                  callback_data=f"##show_statistic##{nickname}##")
-    delete_host_button = InlineKeyboardButton(text=ADMIN_BOTTOMS["Delete host"],
+    delete_host_button = InlineKeyboardButton(text=ADMIN_BUTTONS["Delete host"],
                                               callback_data=f"##delete##{nickname}##")
-    cancel_operation_button = InlineKeyboardButton(text=ADMIN_BOTTOMS["Cancel operation"],
+    cancel_operation_button = InlineKeyboardButton(text=ADMIN_BUTTONS["Cancel operation"],
                                                    callback_data=f"##cancel##operation##")
     keyboard = InlineKeyboardMarkup(inline_keyboard=[[show_statistic_button],
                                                      [delete_host_button],
@@ -51,9 +51,9 @@ def set_options_for_host_kb(nickname: str) -> InlineKeyboardMarkup:
 
 
 def confirm_delete_host_kb(nickname: str) -> InlineKeyboardMarkup:
-    confirm_delete_host_button = InlineKeyboardButton(text=ADMIN_BOTTOMS["Confirm delete"],
+    confirm_delete_host_button = InlineKeyboardButton(text=ADMIN_BUTTONS["Confirm delete"],
                                                       callback_data=f"##confirm##delete##{nickname}##")
-    cancel_operation_button = InlineKeyboardButton(text=ADMIN_BOTTOMS["Cancel operation"],
+    cancel_operation_button = InlineKeyboardButton(text=ADMIN_BUTTONS["Cancel operation"],
                                                    callback_data=f"##cancel##operation##")
     keyboard = InlineKeyboardMarkup(inline_keyboard=[[confirm_delete_host_button],
                                                      [cancel_operation_button]])
@@ -61,7 +61,7 @@ def confirm_delete_host_kb(nickname: str) -> InlineKeyboardMarkup:
 
 
 def return_admin_kb() -> ReplyKeyboardMarkup:
-    return_button = KeyboardButton(text=ADMIN_BOTTOMS["Return"])
+    return_button = KeyboardButton(text=ADMIN_BUTTONS["Return"])
 
     keyboard = ReplyKeyboardMarkup(keyboard=[[return_button],
                                              ],
@@ -71,15 +71,15 @@ def return_admin_kb() -> ReplyKeyboardMarkup:
 
 
 def cancel_state_admin_kb() -> InlineKeyboardMarkup:
-    cancel_state_button = InlineKeyboardButton(text=ADMIN_BOTTOMS["Cancel"],
+    cancel_state_button = InlineKeyboardButton(text=ADMIN_BUTTONS["Cancel"],
                                                callback_data="##cancel##operation##")
     keyboard = InlineKeyboardMarkup(inline_keyboard=[[cancel_state_button]])
     return keyboard
 
 
 def delete_all_data_kb() -> ReplyKeyboardMarkup:
-    delete_all_data = KeyboardButton(text=ADMIN_BOTTOMS["Confirm delete all data"])
-    return_button = KeyboardButton(text=ADMIN_BOTTOMS["Return"])
+    delete_all_data = KeyboardButton(text=ADMIN_BUTTONS["Confirm delete all data"])
+    return_button = KeyboardButton(text=ADMIN_BUTTONS["Return"])
 
     keyboard = ReplyKeyboardMarkup(keyboard=[[delete_all_data],
                                              [return_button],
