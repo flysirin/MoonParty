@@ -37,6 +37,14 @@ async def change_win_lives(callback: CallbackQuery, state: FSMContext, bot: Bot)
                                      reply_markup=host_keyboards.set_lives_inline_kb())
 
 
+@router_game_settings.callback_query(Text("_count_winners_pressed_"))
+async def count_winners(callback: CallbackQuery, state: FSMContext, bot: Bot):
+    await state.set_state(FSMHost.set_count_winners)
+    _count_winners = (await state.get_data()).get('settings', {}).get('count_winners', 1)
+    await callback.message.edit_text(text=f"{HOST_LEXICON['Count winners:']} {_count_winners}",
+                                     reply_markup=host_keyboards.count_winners_inline_kb())
+
+
 @router_game_settings.callback_query(Text("_update_qr_code_data_pressed_"))
 async def update_qr_code_data(callback: CallbackQuery, state: FSMContext, bot: Bot):
     await host_services.update_qr_code_data(state)
