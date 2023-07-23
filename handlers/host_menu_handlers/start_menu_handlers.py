@@ -31,3 +31,11 @@ async def init_game_process(callback: CallbackQuery, state: FSMContext, bot: Bot
     await state.set_state(FSMHost.wait_register_players)
     await state.update_data(active_registration=True)
     await callback.message.delete()
+
+
+@router_start_menu.callback_query(Text("setting_game_pressed"))
+async def game_settings(callback: CallbackQuery, state: FSMContext, bot: Bot):
+    await state.set_state(FSMHost.game_settings)
+    await callback.message.edit_text(text=HOST_LEXICON["Game settings"],
+                                     reply_markup=host_keyboards.game_settings_inline_kb())
+

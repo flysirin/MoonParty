@@ -9,11 +9,11 @@ from lexicon.lexicon import HOST_LEXICON, HOST_BUTTONS
 from services import game, host_services
 import logging
 
-router_wait_registration = Router()
-router_wait_registration.callback_query.filter(StateFilter(FSMHost.wait_register_players))
+router_registration_menu = Router()
+router_registration_menu.callback_query.filter(StateFilter(FSMHost.wait_register_players))
 
 
-@router_wait_registration.callback_query(Text("_update_user_lists_"))
+@router_registration_menu.callback_query(Text("_update_user_lists_"))
 async def update_user_list(callback: CallbackQuery, state: FSMContext):
     players = (await state.get_data()).get('players', {})
     try:
@@ -24,7 +24,7 @@ async def update_user_list(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
 
-@router_wait_registration.callback_query(Text("_start_game_pressed_"))
+@router_registration_menu.callback_query(Text("_start_game_pressed_"))
 async def start_game_process(callback: CallbackQuery, state: FSMContext, bot: Bot):
     players = (await state.get_data()).get('players', {})
     if not len(players) >= 1:
@@ -37,11 +37,11 @@ async def start_game_process(callback: CallbackQuery, state: FSMContext, bot: Bo
     await game.game_process(host_id=callback.from_user.id, bot=bot)
     game_info = await host_services.get_game_info(host_id=callback.from_user.id, bot=bot)
     await callback.message.edit_text(text=game_info,
-                                     reply_markup=host_keyboards.game_process_menu())
+                                     reply_markup=host_keyboards.game_process_menu_inline_kb())
     await game.start_init_players(host_id=callback.from_user.id)
 
 
-@router_wait_registration.callback_query(Text("_view_qr_code_pressed_"))
+@router_registration_menu.callback_query(Text("_view_qr_code_pressed_"))
 async def view_qr_code(callback: CallbackQuery, state: FSMContext, bot: Bot):
     await host_services.send_curr_qr_code(chat_id=callback.from_user.id,
                                           host_username=callback.from_user.username,
@@ -54,20 +54,20 @@ async def view_qr_code(callback: CallbackQuery, state: FSMContext, bot: Bot):
     await callback.message.delete()
 
 
-@router_wait_registration.callback_query(Text("_select_players_pressed_"))
+@router_registration_menu.callback_query(Text("_select_players_pressed_"))
 async def select_players(callback: CallbackQuery, state: FSMContext, bot: Bot):
     await state.set_state(FSMHost.select_players)
     players = (await state.get_data()).get('players', {})
     await callback.message.edit_text(text=HOST_LEXICON["Choose a player"],
-                                     reply_markup=host_keyboards.select_player_inline_kb(**players))
+                                     reply_markup=host_keyboards.select_players_inline_kb(**players))
 
 
-@router_wait_registration.callback_query(Text("_setting_game_pressed_"))
+@router_registration_menu.callback_query(Text("_setting_game_pressed_"))
 async def settings_menu(callback: CallbackQuery, state: FSMContext, bot: Bot):
     pass
 
 
-@router_wait_registration.callback_query(Text("_exit_main_menu_pressed_"))
+@router_registration_menu.callback_query(Text("_exit_main_menu_pressed_"))
 async def update_user_list(callback: CallbackQuery, state: FSMContext):
     await state.set_state(None)
     await callback.message.edit_text(text=HOST_LEXICON["Choose an option"],
@@ -76,6 +76,6 @@ async def update_user_list(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
 
-@router_wait_registration.callback_query(Text("__hide__qr_code__"))
+@router_registration_menu.callback_query(Text("__hide__qr_code__"))
 async def hide_qr_code(callback: CallbackQuery):
     await callback.message.delete()
