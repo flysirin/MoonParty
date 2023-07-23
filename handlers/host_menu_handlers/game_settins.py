@@ -37,6 +37,18 @@ async def change_win_lives(callback: CallbackQuery, state: FSMContext, bot: Bot)
                                      reply_markup=host_keyboards.set_lives_inline_kb())
 
 
+@router_game_settings.callback_query(Text("_spread_roles_pressed_"))
+async def spread_roles(callback: CallbackQuery, state: FSMContext, bot: Bot):
+    await state.set_state(FSMHost.change_spread_roles)
+    _spread_roles: dict = (await state.get_data()).get('settings', {}).get('percent_role', {})
+    info = f"{_spread_roles['human']}%-{HOST_LEXICON['human']} / "\
+           f"{_spread_roles['wolf']}%-{HOST_LEXICON['wolf']} / "\
+           f"{_spread_roles['werewolf']}%-{HOST_LEXICON['werewolf']}"
+    await state.update_data(change_spread_roles=_spread_roles)
+    await callback.message.edit_text(text=f"{HOST_LEXICON['Spread roles']}\n {info}",
+                                     reply_markup=host_keyboards.spread_roles_inline_kb())
+
+
 @router_game_settings.callback_query(Text("_count_winners_pressed_"))
 async def count_winners(callback: CallbackQuery, state: FSMContext, bot: Bot):
     await state.set_state(FSMHost.set_count_winners)

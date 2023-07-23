@@ -11,7 +11,7 @@ from aiogram.types import Message, CallbackQuery
 from keyboards import admin_keyboards
 
 from services.other import delete_last_message
-from lexicon.lexicon import ADMIN_LEXICON, ADMIN_BOTTOMS
+from lexicon.lexicon import ADMIN_LEXICON, ADMIN_BUTTONS
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -33,7 +33,7 @@ async def process_start_command(message: Message, state: FSMContext, bot: Bot):
 
 
 # --> Handlers for add hosts
-@router_admin.message(Text(text=ADMIN_BOTTOMS["Add host"]))
+@router_admin.message(Text(text=ADMIN_BUTTONS["Add host"]))
 async def add_host(message: Message, state: FSMContext, bot: Bot):
     await delete_last_message(chat_id=message.from_user.id, state=state, bot=bot)
 
@@ -61,7 +61,7 @@ async def add_host(message: Message, state: FSMContext, bot: Bot):
     await message.delete()
 
 
-@router_admin.message(~Text(text=list(ADMIN_BOTTOMS.values())), StateFilter(FSMAdmin.add_host))
+@router_admin.message(~Text(text=list(ADMIN_BUTTONS.values())), StateFilter(FSMAdmin.add_host))
 async def another_wrong(message: Message, state: FSMContext, bot: Bot):
     await delete_last_message(chat_id=message.from_user.id, state=state, bot=bot)
     cur_message = await message.answer(text=f"{message.text}\n{ADMIN_LEXICON['Incorrect input user']}",
@@ -74,7 +74,7 @@ async def another_wrong(message: Message, state: FSMContext, bot: Bot):
 
 
 # --> Handlers for delete all data
-@router_admin.message(Text(text=ADMIN_BOTTOMS["Delete all data!"]))
+@router_admin.message(Text(text=ADMIN_BUTTONS["Delete all data!"]))
 async def cancel_all_data(message: Message, state: FSMContext, bot: Bot):
     await state.set_state(FSMAdmin.delete_all_data)
     await delete_last_message(chat_id=message.from_user.id, state=state, bot=bot)
@@ -84,7 +84,7 @@ async def cancel_all_data(message: Message, state: FSMContext, bot: Bot):
     await message.delete()
 
 
-@router_admin.message(Text(text=ADMIN_BOTTOMS["Confirm delete all data"]), StateFilter(FSMAdmin.delete_all_data))
+@router_admin.message(Text(text=ADMIN_BUTTONS["Confirm delete all data"]), StateFilter(FSMAdmin.delete_all_data))
 async def confirm_delete_all_data(message: Message, state: FSMContext, bot: Bot):
     await delete_last_message(chat_id=message.from_user.id, state=state, bot=bot)
     cur_message = await message.answer(text=ADMIN_LEXICON["All data was deleted!"],
@@ -97,7 +97,7 @@ async def confirm_delete_all_data(message: Message, state: FSMContext, bot: Bot)
 
 
 # --> Handlers for show and delete hosts
-@router_admin.message(Text(text=ADMIN_BOTTOMS["Show hosts"]))
+@router_admin.message(Text(text=ADMIN_BUTTONS["Show hosts"]))
 async def show_hosts(message: Message, state: FSMContext, bot: Bot):
     await delete_last_message(chat_id=message.from_user.id, state=state, bot=bot)
     hosts = (await state.get_data()).get('hosts', {})
@@ -166,7 +166,7 @@ async def cancel_operation_host(callback: CallbackQuery, state: FSMContext, bot:
     await state.set_state(None)
 
 
-@router_admin.message(Text(text=ADMIN_BOTTOMS["Return"]))
+@router_admin.message(Text(text=ADMIN_BUTTONS["Return"]))
 async def return_main_menu(message: Message, state: FSMContext, bot: Bot):
     await delete_last_message(chat_id=message.from_user.id, state=state, bot=bot)
     cur_message = await message.answer(text=ADMIN_LEXICON["/start"],

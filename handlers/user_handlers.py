@@ -9,7 +9,7 @@ from states.user_states import FSMUser
 from aiogram.filters import Command, CommandStart, StateFilter, Text
 from filters.member_filters import CheckPassFilter, CheckSpeakerFilter, CheckUserConnectFilter
 from aiogram.types import Message, CallbackQuery
-from lexicon.lexicon import USER_LEXICON, USER_BOTTOMS
+from lexicon.lexicon import USER_LEXICON, USER_BUTTONS
 from keyboards import user_keyboards
 from services.user_services import get_active_rooms, register_user_in_room, update_user_nickname
 
@@ -46,7 +46,7 @@ async def process_help_command(message: Message):
     await message.answer(text=USER_LEXICON["/help"])
 
 
-@router_user.message(Text(USER_BOTTOMS["Show active rooms"]), StateFilter(default_state))
+@router_user.message(Text(USER_BUTTONS["Show active rooms"]), StateFilter(default_state))
 async def show_active_rooms(message: Message, state: FSMContext):
     active_rooms = await get_active_rooms()
     await message.answer(
@@ -56,7 +56,7 @@ async def show_active_rooms(message: Message, state: FSMContext):
     await asyncio.sleep(1)
 
 
-@router_user.message(Text(USER_BOTTOMS['Set nickname']), StateFilter(default_state))
+@router_user.message(Text(USER_BUTTONS['Set nickname']), StateFilter(default_state))
 async def set_nickname_pressed(message: Message, state: FSMContext):
     await state.set_state(FSMUser.set_nickname)
     await message.answer(text=USER_LEXICON["Input your nickname"],
