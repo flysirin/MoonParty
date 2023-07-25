@@ -49,13 +49,12 @@ async def change_spread(callback: CallbackQuery, state: FSMContext, bot: Bot):
     sum_percent_roles = spread_roles['werewolf'] + spread_roles['human'] + spread_roles['wolf']
     _flag = ['🚫', '✅'][sum_percent_roles == 100]
 
-    info = f"{spread_roles['human']}% - {HOST_LEXICON['human']} \n" \
-           f"{spread_roles['wolf']}% - {HOST_LEXICON['wolf']} \n" \
-           f"{spread_roles['werewolf']}% - {HOST_LEXICON['werewolf']} \n" \
-           f"{HOST_LEXICON['Sum percent roles:']} {sum_percent_roles} {_flag}"
+    info = f"{HOST_LEXICON['human']} / {HOST_LEXICON['wolf']} / {HOST_LEXICON['werewolf']}\n" \
+           f"    {spread_roles['human']}%      /   {spread_roles['wolf']}%   /      {spread_roles['werewolf']}%"\
+           f"\n{HOST_LEXICON['Sum percent roles:']} {sum_percent_roles} {_flag}"
 
     try:
-        await callback.message.edit_text(text=f"{HOST_LEXICON['Spread roles']}\n {info}",
+        await callback.message.edit_text(text=f"{HOST_LEXICON['Spread roles']}\n\n <b>{info}</b>",
                                          reply_markup=host_keyboards.spread_roles_inline_kb())
     except BaseException as e:
         await callback.answer()
@@ -67,15 +66,15 @@ async def confirm_spread_roles(callback: CallbackQuery, state: FSMContext, bot: 
     host_data = await state.get_data()
     spread_roles = (await state.get_data()).get('change_spread_roles', {})
     if (spread_roles['human'] + spread_roles['wolf'] + spread_roles['werewolf']) != 100:
-        return await callback.answer(text=HOST_LEXICON['Spread roles'], show_alert=True)
+        return await callback.answer(text=HOST_LEXICON['Exception spread role'], show_alert=True)
 
     host_data['settings']['percent_role'] = spread_roles
     await state.update_data(data=host_data)
-    info = f"{spread_roles['human']}%-{HOST_LEXICON['human']} / " \
-           f"{spread_roles['wolf']}%-{HOST_LEXICON['wolf']} / " \
-           f"{spread_roles['werewolf']}%-{HOST_LEXICON['werewolf']}"
+    info = f"{HOST_LEXICON['human']} / {HOST_LEXICON['wolf']} / {HOST_LEXICON['werewolf']}\n" \
+           f"    {spread_roles['human']}%     /   {spread_roles['wolf']}%   /     {spread_roles['werewolf']}%"
+
     try:
-        await callback.message.edit_text(text=f"{HOST_LEXICON['Spread roles']}\n {info}",
+        await callback.message.edit_text(text=f"{HOST_LEXICON['Spread roles']}\n\n <b>{info}</b>",
                                          reply_markup=host_keyboards.spread_roles_inline_kb())
     except BaseException as e:
         await callback.answer()

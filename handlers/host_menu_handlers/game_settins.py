@@ -38,19 +38,18 @@ async def change_win_lives(callback: CallbackQuery, state: FSMContext, bot: Bot)
 
 
 @router_game_settings.callback_query(Text("_spread_roles_pressed_"))
-async def spread_roles(callback: CallbackQuery, state: FSMContext, bot: Bot):
+async def spread_roles_process(callback: CallbackQuery, state: FSMContext, bot: Bot):
     await state.set_state(FSMHost.change_spread_roles)
-    _spread_roles: dict = (await state.get_data()).get('settings', {}).get('percent_role', {})
-    info = f"{_spread_roles['human']}%-{HOST_LEXICON['human']} / "\
-           f"{_spread_roles['wolf']}%-{HOST_LEXICON['wolf']} / "\
-           f"{_spread_roles['werewolf']}%-{HOST_LEXICON['werewolf']}"
-    await state.update_data(change_spread_roles=_spread_roles)
-    await callback.message.edit_text(text=f"{HOST_LEXICON['Spread roles']}\n {info}",
+    spread_roles: dict = (await state.get_data()).get('settings', {}).get('percent_role', {})
+    info = f"{HOST_LEXICON['human']} / {HOST_LEXICON['wolf']} / {HOST_LEXICON['werewolf']}\n" \
+           f"    {spread_roles['human']}%     /   {spread_roles['wolf']}%   /     {spread_roles['werewolf']}%"
+    await state.update_data(change_spread_roles=spread_roles)
+    await callback.message.edit_text(text=f"{HOST_LEXICON['Spread roles']}\n\n {info}",
                                      reply_markup=host_keyboards.spread_roles_inline_kb())
 
 
 @router_game_settings.callback_query(Text("_count_winners_pressed_"))
-async def count_winners(callback: CallbackQuery, state: FSMContext, bot: Bot):
+async def count_winners_process(callback: CallbackQuery, state: FSMContext, bot: Bot):
     await state.set_state(FSMHost.set_count_winners)
     _count_winners = (await state.get_data()).get('settings', {}).get('count_winners', 1)
     await callback.message.edit_text(text=f"{HOST_LEXICON['Count winners:']} {_count_winners}",
