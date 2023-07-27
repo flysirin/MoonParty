@@ -48,13 +48,13 @@ def select_players_inline_kb(**kwargs) -> InlineKeyboardMarkup:
             buttons.append(InlineKeyboardButton(text=f"{HOST_BUTTONS['Player: ']}{nickname}",
                                                 callback_data=f"__{user_id}__player__user_id__"))
 
-    buttons.append(exit_button)
     buttons.append(delete_all_button)
+    buttons.append(exit_button)
     kb_builder.row(*buttons, width=1)
     return kb_builder.as_markup()  # return object inline kb
 
 
-def select_one_player_inline_kb(player: int) -> InlineKeyboardMarkup:
+def select_one_player_inline_kb(player: str) -> InlineKeyboardMarkup:
     delete_player = InlineKeyboardButton(text=HOST_BUTTONS["Delete"],
                                          callback_data=f"_delete_player_id_{player}_pressed_")
     exit_to_select_players = InlineKeyboardButton(text=HOST_BUTTONS["Exit"],
@@ -219,7 +219,7 @@ def select_players_in_game_inline_kb(**kwargs) -> InlineKeyboardMarkup:
     return kb_builder.as_markup()  # return object inline kb
 
 
-def select_one_player_in_game_inline_kb(player_id: int) -> InlineKeyboardMarkup:
+def select_one_player_in_game_inline_kb(player_id: str) -> InlineKeyboardMarkup:
     up_lives_player = InlineKeyboardButton(text=HOST_BUTTONS["Up lives"],
                                            callback_data=f"_up___lives_player_id_{player_id}_pressed_")
     down_lives_player = InlineKeyboardButton(text=HOST_BUTTONS["Down lives"],
