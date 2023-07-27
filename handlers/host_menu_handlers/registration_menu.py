@@ -62,9 +62,9 @@ async def select_players(callback: CallbackQuery, state: FSMContext, bot: Bot):
                                      reply_markup=host_keyboards.select_players_inline_kb(**players))
 
 
-@router_registration_menu.callback_query(Text("_setting_game_pressed_"))
-async def settings_menu(callback: CallbackQuery, state: FSMContext, bot: Bot):
-    pass
+# @router_registration_menu.callback_query(Text("_setting_game_pressed_"))
+# async def settings_menu(callback: CallbackQuery, state: FSMContext, bot: Bot):
+#     pass
 
 
 @router_registration_menu.callback_query(Text("_exit_main_menu_pressed_"))

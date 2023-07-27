@@ -16,11 +16,11 @@ router_select_players_in_game.callback_query.filter(StateFilter(FSMHost.select_p
 @router_select_players_in_game.callback_query(Text(contains="__player__user_id__"))
 async def select_player(callback: CallbackQuery, state: FSMContext):
     await state.set_state(FSMHost.select_one_player_in_game)
-    player_id: str = callback.message.text[2:-19]
+    player_id: str = callback.data[2:-19]
     players = (await state.get_data()).get('players', {})
-    nickname = players[int(player_id)]['nickname']
-    lives = players[int(player_id)]['lives']
-    await callback.message.edit_text(text=f"{HOST_LEXICON['chose option for player']}: {nickname}\n"
+    nickname = players[player_id]['nickname']
+    lives = players[player_id]['lives']
+    await callback.message.edit_text(text=f"{HOST_LEXICON['Player:']} {nickname}\n"
                                           f"{HOST_LEXICON['lives:']} {lives}",
                                      reply_markup=host_keyboards.select_one_player_in_game_inline_kb(player_id=player_id))
 
@@ -28,6 +28,7 @@ async def select_player(callback: CallbackQuery, state: FSMContext):
 @router_select_players_in_game.callback_query(Text("_return_game_process_pressed_"))
 async def return_game_process(callback: CallbackQuery, state: FSMContext, bot: Bot):
     game_info = await host_services.get_game_info(host_id=callback.from_user.id, bot=bot)
+    await state.set_state(FSMHost.game_process)
     try:
         await callback.message.edit_text(text=game_info,
                                          reply_markup=host_keyboards.game_process_menu_inline_kb())

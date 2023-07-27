@@ -16,11 +16,14 @@ router_select_one_player.callback_query.filter(StateFilter(FSMHost.select_one_pl
 
 @router_select_one_player.callback_query(Text(startswith=f"_delete_player_id_"))
 async def delete_all_players(callback: CallbackQuery, state: FSMContext, bot: Bot):
-    player_id = int(callback.message.text[18:-9])
+    player_id: str = callback.data[18:-9]
     host_data = (await state.get_data())
+    player_nickname = host_data['players'][player_id]['nickname']
     del host_data['players'][player_id]
     await state.update_data(data=host_data)
-
+    await callback.answer(text=f"{player_nickname} - "
+                               f"{HOST_LEXICON['Player has been removed']}",
+                          show_alert=True)
     await select_players(callback, state, bot)
 
 

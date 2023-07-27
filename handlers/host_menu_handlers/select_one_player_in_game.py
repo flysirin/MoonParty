@@ -14,10 +14,10 @@ router_select_one_player_in_game = Router()
 router_select_one_player_in_game.callback_query.filter(StateFilter(FSMHost.select_one_player_in_game))
 
 
-@router_select_one_player_in_game.callback_query(Text(startswith=["_down_lives_player_id_", '_up_lives_player_id_']))
+@router_select_one_player_in_game.callback_query(Text(startswith=["_down_lives_player_id_", '_up___lives_player_id_']))
 async def delete_all_players(callback: CallbackQuery, state: FSMContext, bot: Bot):
     host_data = await state.get_data()
-    player_id: int = int(callback.message.text[22:-9])
+    player_id: str = callback.data[22:-9]
     nickname = host_data['players'][player_id]['nickname']
 
     if callback.data.startswith("_up___lives_player_id_pressed_"):
@@ -30,7 +30,7 @@ async def delete_all_players(callback: CallbackQuery, state: FSMContext, bot: Bo
 
     lives = host_data['players'][player_id]['lives']
     await state.update_data(data=host_data)
-    await callback.message.edit_text(text=f"{HOST_LEXICON['chose option for player']}: {nickname}\n"
+    await callback.message.edit_text(text=f"{HOST_LEXICON['Player:']} {nickname}\n"
                                           f"{HOST_LEXICON['lives:']} {lives}",
                                      reply_markup=host_keyboards.select_one_player_in_game_inline_kb(
                                          player_id=player_id))

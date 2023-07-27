@@ -52,6 +52,7 @@ async def confirm_finish_game_process(callback: CallbackQuery, state: FSMContext
 
 @router_game_process.callback_query(Text("_return_game_process_pressed_"))
 async def return_game_process(callback: CallbackQuery, state: FSMContext, bot: Bot):
+    await state.set_state(FSMHost.game_process)
     game_info = await host_services.get_game_info(host_id=callback.from_user.id, bot=bot)
     await callback.message.edit_text(text=game_info,
                                      reply_markup=host_keyboards.game_process_menu_inline_kb())

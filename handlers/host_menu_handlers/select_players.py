@@ -1,3 +1,5 @@
+from typing import Any
+
 from aiogram import Router, F, Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
@@ -31,10 +33,10 @@ async def delete_all(callback: CallbackQuery, state: FSMContext):
 @router_select_players.callback_query(Text(contains="__player__user_id__"))
 async def select_player(callback: CallbackQuery, state: FSMContext):
     await state.set_state(FSMHost.select_one_player)
-    player_id: int = int(callback.message.text[2:-19])
-    players = (await state.get_data()).get('players', {})
-    nickname = players[int(player_id)]['nickname']
-    await callback.message.edit_text(text=f"{HOST_LEXICON['chose option for player']} {nickname}",
+    player_id: str = callback.data[2:-19]
+    players: dict[str | Any] = (await state.get_data()).get('players', {})
+    nickname = players[player_id]['nickname']
+    await callback.message.edit_text(text=f"{HOST_LEXICON['Choose an option for player:']} {nickname}",
                                      reply_markup=host_keyboards.select_one_player_inline_kb(player=player_id))
 
 
